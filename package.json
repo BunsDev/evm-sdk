@@ -60,6 +60,8 @@
   "dependencies": {
     "bignumber.js": "9.0.1",
     "ethers": "5.4.5",
-    "ts-method-cache": "3.3.1"
+    "ts-method-cache": "3.3.1",
+    "wow-swap-protocol": "git+ssh://git@github.com/wowswap-io/protocol.git#211b701428daab057f8aab5543eeb5503f37e522",
+    "wowswap-price-feed": "git+ssh://git@github.com/wowswap-io/price-feed.git#b91c028d6b5e30c61ad42f46758531986f21ceab"
   }
 }
