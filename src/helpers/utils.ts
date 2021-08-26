@@ -1,6 +1,5 @@
 import { getAddress } from '@ethersproject/address';
 import { Provider } from '@ethersproject/abstract-provider';
-import '@nomiclabs/hardhat-ethers';
 import { IERC20Detailed__factory } from 'wow-swap-protocol/types';
 
 export const addressToERC20 = (provider: Provider) => (address: string) =>

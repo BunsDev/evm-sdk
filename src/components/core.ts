@@ -1,7 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Network } from '@ethersproject/networks';
 import { Provider } from '@ethersproject/abstract-provider';
-import '@nomiclabs/hardhat-ethers';
 import { BaseContract, Signer } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
 import { Multisender } from '../helpers/multisender';
