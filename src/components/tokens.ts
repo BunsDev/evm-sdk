@@ -1,7 +1,7 @@
 import {
   IERC20Detailed,
   IERC20Detailed__factory
-} from 'wow-swap-protocol/types';
+} from '../contracts/protocol/types';
 import { InferContext } from './abstract';
 import { CoreRelevant } from './core';
 

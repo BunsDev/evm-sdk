@@ -1,0 +1,9 @@
+[submodule "src/contracts/protocol"]
+	path = src/contracts/protocol
+	url = git@github.com:wowswap-io/protocol.git
+[submodule "src/contracts/price-feed"]
+	path = src/contracts/price-feed
+	url = git@github.com:wowswap-io/price-feed.git
+[submodule "src/contracts/governance"]
+	path = src/contracts/governance
+	url = git@github.com:wowswap-io/governance.git

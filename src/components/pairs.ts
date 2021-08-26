@@ -6,7 +6,7 @@ import {
   Pair__factory,
   ShortingPair,
   ShortingPair__factory,
-} from 'wow-swap-protocol/types';
+} from '../contracts/protocol/types';
 import { byteToAddress, mapAll } from '../helpers/utils';
 import { BlockTag } from '../types';
 import { InferContext } from './abstract';

@@ -1,5 +1,5 @@
 import { MemoryCache } from 'ts-method-cache';
-import { NewPriceGuardFactory__factory } from 'wow-swap-protocol/types';
+import { NewPriceGuardFactory__factory } from '../contracts/protocol/types';
 import '../helpers/math';
 import { InferContext } from './abstract';
 import { CoreRelevant } from './core';

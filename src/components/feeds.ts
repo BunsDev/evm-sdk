@@ -4,7 +4,7 @@ import {
   PriceFeed,
   PriceFeedFactory__factory,
   PriceFeed__factory,
-} from 'wowswap-price-feed/types';
+} from '../contracts/price-feed/types';
 import '../helpers/math';
 import { amount, BN, toBN } from '../helpers/math';
 import { InferContext } from './abstract';

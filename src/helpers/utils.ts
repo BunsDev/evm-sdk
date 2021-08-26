@@ -1,6 +1,6 @@
 import { getAddress } from '@ethersproject/address';
 import { Provider } from '@ethersproject/abstract-provider';
-import { IERC20Detailed__factory } from 'wow-swap-protocol/types';
+import { IERC20Detailed__factory } from '../contracts/protocol/types';
 
 export const addressToERC20 = (provider: Provider) => (address: string) =>
   IERC20Detailed__factory.connect(address, provider);
