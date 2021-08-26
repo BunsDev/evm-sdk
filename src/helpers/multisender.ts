@@ -1,6 +1,6 @@
 import { Provider } from '@ethersproject/abstract-provider';
 import { BaseContract, BigNumber, BytesLike } from 'ethers';
-import { Multicall, Multicall__factory } from '../contracts/protocol/types';
+import { Multicall, Multicall__factory } from '../dependencies/protocol';
 
 export interface CallRequest {
   onResult: (response: string, height: BigNumber) => void;

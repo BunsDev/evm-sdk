@@ -1,6 +1,6 @@
 import { getAddress } from '@ethersproject/address';
 import { Provider } from '@ethersproject/abstract-provider';
-import { IERC20Detailed__factory } from '../contracts/protocol/types';
+import { IERC20Detailed__factory } from '../dependencies/protocol';
 
 export const addressToERC20 = (provider: Provider) => (address: string) =>
   IERC20Detailed__factory.connect(address, provider);

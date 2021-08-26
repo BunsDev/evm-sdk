@@ -4,7 +4,7 @@ import {
   Reserve,
   ReserveFactory__factory,
   Reserve__factory,
-} from '../contracts/protocol/types';
+} from '../dependencies/protocol';
 import { byteToAddress, mapAll } from '../helpers/utils';
 import { BlockTag } from '../types';
 import { InferContext } from './abstract';

@@ -4,7 +4,7 @@ import {
   PriceFeed,
   PriceFeedFactory__factory,
   PriceFeed__factory,
-} from '../contracts/price-feed/types';
+} from '../dependencies/price-feed';
 import '../helpers/math';
 import { amount, BN, toBN } from '../helpers/math';
 import { InferContext } from './abstract';

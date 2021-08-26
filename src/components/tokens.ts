@@ -1,7 +1,7 @@
 import {
   IERC20Detailed,
   IERC20Detailed__factory
-} from '../contracts/protocol/types';
+} from '../dependencies/protocol';
 import { InferContext } from './abstract';
 import { CoreRelevant } from './core';
 
