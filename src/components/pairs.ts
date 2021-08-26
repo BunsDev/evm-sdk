@@ -1,10 +1,11 @@
+import { AddressZero } from '@ethersproject/constants';
 import { MemoryCache } from 'ts-method-cache';
 import {
   Pair,
   PairFactory__factory,
   Pair__factory,
   ShortingPair,
-  ShortingPair__factory
+  ShortingPair__factory,
 } from 'wow-swap-protocol/types';
 import { byteToAddress, mapAll } from '../helpers/utils';
 import { BlockTag } from '../types';
@@ -98,7 +99,7 @@ export class Pairs extends CoreRelevant<
     proxy?: string
   ): Promise<Pair | undefined> {
     return this._useLongPairCached(lendable, tradable, proxy).then((address) =>
-      address === this.hre.ethers.constants.AddressZero
+      address === AddressZero
         ? undefined
         : this.core.useContract(Pair__factory, address)
     );
@@ -114,7 +115,7 @@ export class Pairs extends CoreRelevant<
       shortable,
       proxy
     ).then((address) =>
-      address === this.hre.ethers.constants.AddressZero
+      address === AddressZero
         ? undefined
         : this.core.useContract(ShortingPair__factory, address)
     );

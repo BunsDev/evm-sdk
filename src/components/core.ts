@@ -1,8 +1,11 @@
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Network } from '@ethersproject/networks';
+import { Provider } from '@ethersproject/abstract-provider';
 import '@nomiclabs/hardhat-ethers';
-import { BaseContract } from 'ethers';
+import { BaseContract, Signer } from 'ethers';
+import { AddressZero } from '@ethersproject/constants';
 import { Multisender } from '../helpers/multisender';
 import { AbstractComponent, InferContext } from './abstract';
-import { Provider } from '@ethersproject/abstract-provider';
 
 type GenericFactory<T> = {
   connect(address: string, provider: Provider): T;
@@ -20,14 +23,14 @@ export class Core extends AbstractComponent<{
     super(context);
 
     this.sender = new Multisender(
-      this.hre.ethers.provider,
+      this.provider,
 
       this.params.contracts.multicall
     );
   }
 
-  useProvider() {
-    return this.hre.ethers.provider;
+  useProvider(): JsonRpcProvider {
+    return this.provider;
   }
 
   useContracts() {
@@ -56,22 +59,24 @@ export class Core extends AbstractComponent<{
   }
 
   useNonce(address: string) {
-    return this.hre.ethers.provider.getTransactionCount(address);
+    return this.provider.getTransactionCount(address);
   }
 
-  useSigners() {
-    return this.hre.ethers.getSigners();
+  useSigners(): Promise<Signer[]> {
+    return this.provider
+      .listAccounts()
+      .then((accounts) => Promise.all(accounts.map(this.provider.getSigner)));
   }
 
-  useNetwork() {
-    return this.hre.ethers.provider.getNetwork();
+  useNetwork() : Promise<Network> {
+    return this.provider.getNetwork();
   }
 
   useContract<T extends BaseContract>(
     factory: GenericFactory<T>,
     address: string
   ) {
-    if (!address || this.hre.ethers.constants.AddressZero === address) {
+    if (!address || AddressZero === address) {
       throw new Error('Undefined address');
     }
     return factory.connect(address, this.useProvider());

@@ -1,13 +1,6 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import hre from 'hardhat';
-
+import { JsonRpcProvider } from '@ethersproject/providers';
 import {
-  Tokens,
-  Core,
-  Pairs,
-  Reserves,
-  PriceFeeds,
-  Guards,
+  Core, Guards, Pairs, PriceFeeds, Reserves, Tokens
 } from './components';
 import { InferParams } from './components/abstract';
 
@@ -20,7 +13,7 @@ export class Context {
   readonly reserves: Reserves;
 
   constructor(
-    public readonly hre: HardhatRuntimeEnvironment,
+    public readonly provider: JsonRpcProvider,
     public readonly params: InferParams<Core> &
       InferParams<Tokens> &
       InferParams<PriceFeeds> &
@@ -35,23 +28,4 @@ export class Context {
     this.pairs = new Pairs(this);
     this.reserves = new Reserves(this);
   }
-}
-
-export async function test() {
-  const zero = hre.ethers.constants.AddressZero;
-  const ctx = new Context(hre, {
-    contracts: {
-      multicall: zero,
-      native: zero,
-      usd: zero,
-      guardsFactory: zero,
-      pairFactory: zero,
-      priceFeedFactory: zero,
-      reserveFactory: zero,
-    },
-  });
-
-  const details = await ctx.tokens.useDetails('test');
-
-  console.log(details);
 }

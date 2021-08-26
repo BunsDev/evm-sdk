@@ -1,7 +1,7 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { JsonRpcProvider } from '@ethersproject/providers';
 
 export type Context<TParams = {}, TDependencies = {}> = {
-  readonly hre: HardhatRuntimeEnvironment;
+  readonly provider: JsonRpcProvider;
   readonly params: TParams;
 } & TDependencies;
 
@@ -23,8 +23,8 @@ export type InferDeps<T> = T extends AbstractComponent<any, infer TDeps>
 export abstract class AbstractComponent<TParams = {}, TDependencies = {}> {
   constructor(protected context: Context<TParams, TDependencies>) {}
 
-  protected get hre() {
-    return this.context.hre;
+  protected get provider() {
+    return this.context.provider;
   }
   protected get params() {
     return this.context.params;

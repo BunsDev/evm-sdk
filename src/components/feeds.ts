@@ -9,6 +9,7 @@ import '../helpers/math';
 import { amount, BN, toBN } from '../helpers/math';
 import { InferContext } from './abstract';
 import { CoreRelevant } from './core';
+import { AddressZero } from '@ethersproject/constants';
 
 export class PriceFeeds extends CoreRelevant<{
   contracts: Record<typeof PriceFeeds.REQUIRED_ADDRESSES[number], string>;
@@ -66,7 +67,7 @@ export class PriceFeeds extends CoreRelevant<{
     let feed = await this.core
       .useCall(factory, 'getPriceFeed', left, right)
       .then((feed) =>
-        feed === this.hre.ethers.constants.AddressZero
+        feed === AddressZero
           ? undefined
           : this.core.useContract(PriceFeed__factory, feed)
       );

@@ -1,3 +1,4 @@
+import { AddressZero } from '@ethersproject/constants';
 import { MemoryCache } from 'ts-method-cache';
 import {
   Reserve,
@@ -49,7 +50,7 @@ export class Reserves extends CoreRelevant<{
 
   useReserve(lendable: string): Promise<Reserve | undefined> {
     return this._useReserveCached(lendable).then((address) =>
-      address === this.hre.ethers.constants.AddressZero
+      address === AddressZero
         ? undefined
         : this.core.useContract(Reserve__factory, address)
     );
