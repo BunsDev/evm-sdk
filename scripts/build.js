@@ -71,5 +71,6 @@ moveFile('dist-browser', 'dist/browser', 'index.js.map');
 moveFile('dist-browser', 'dist/types');
 
 proc.execSync('npm run prepare');
+proc.execSync('./scripts/types.sh');
 
 console.log('Build finished!');
