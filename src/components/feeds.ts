@@ -82,6 +82,8 @@ export class PriceFeeds extends CoreRelevant<{
         .then((feed) => this.core.useContract(PriceFeed__factory, feed));
     }
 
+    this.core.useCall(feed!, "getCurrentPrice")
+
     return feed;
   }
 }

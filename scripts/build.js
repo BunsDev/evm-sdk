@@ -70,4 +70,6 @@ moveFile('dist-browser', 'dist/browser', 'index.js.map');
 // therefore we move and rename it to 'dist/types'
 moveFile('dist-browser', 'dist/types');
 
+proc.execSync('npm run prepare');
+
 console.log('Build finished!');

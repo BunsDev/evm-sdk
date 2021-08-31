@@ -4,6 +4,15 @@ import {
 } from './components';
 import { InferParams } from './components/abstract';
 
+export * from './helpers/utils'
+export * from './helpers/math'
+
+import * as governance from './dependencies/governance'
+import * as priceFeed from './dependencies/price-feed'
+import * as protocol from './dependencies/protocol'
+
+export { governance, priceFeed, protocol}
+
 export class Context {
   readonly tokens: Tokens;
   readonly core: Core;

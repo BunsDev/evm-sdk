@@ -16,8 +16,8 @@ export type CallResult<
   TContract extends BaseContract,
   TMethod extends keyof TContract['functions']
 > = ReturnType<TContract['functions'][TMethod]> extends Promise<infer R>
-  ? R extends Array<infer EL>
-    ? EL
+  ? R extends [infer F]
+    ? F & R
     : R
   : never;
 
@@ -38,7 +38,10 @@ export class Multisender {
     this.contract = Multicall__factory.connect(this.address, this.provider);
   }
 
-  async callWithBlock<T extends BaseContract, TMethod extends keyof T['functions']>(
+  async callWithBlock<
+    T extends BaseContract,
+    TMethod extends keyof T['functions']
+  >(
     contract: T,
     methodName: TMethod,
     ...args: Parameters<T['functions'][TMethod]>
@@ -104,7 +107,7 @@ export class Multisender {
   async update() {
     if (this.processing) return;
     this.processing = true;
-    
+
     while (this.queue.length) {
       const requests = this.queue.splice(0, 100);
 
