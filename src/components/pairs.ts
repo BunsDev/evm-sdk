@@ -56,7 +56,7 @@ export class Pairs extends CoreRelevant<
     tradable: string,
     proxy?: string
   ): Promise<string> {
-    const call = this.core.useCall;
+    const call = this.core.useCall.bind(this.core);
     const factory = this.usePairFactory();
     return proxy
       ? call(factory, 'getRoutablePair', lendable, proxy, tradable)
@@ -69,7 +69,7 @@ export class Pairs extends CoreRelevant<
     shortable: string,
     proxy?: string
   ): Promise<string> {
-    const call = this.core.useCall;
+    const call = this.core.useCall.bind(this.core);
     const factory = this.usePairFactory();
     return proxy
       ? call(factory, 'getRoutableShortingPair', lendable, proxy, shortable)
