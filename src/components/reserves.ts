@@ -37,9 +37,8 @@ export class Reserves extends CoreRelevant<{
 
   @MemoryCache()
   private _useReserveCached(lendable: string): Promise<string> {
-    const call = this.core.useCall.bind(this.core);
     const factory = this.useReserveFactory();
-    return call(factory, 'getReserve', lendable);
+    return this.core.useCall(factory, 'getReserve', lendable);
   }
 
   useAllLendables(blockTag?: BlockTag) {

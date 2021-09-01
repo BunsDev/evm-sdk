@@ -56,11 +56,10 @@ export class Pairs extends CoreRelevant<
     tradable: string,
     proxy?: string
   ): Promise<string> {
-    const call = this.core.useCall.bind(this.core);
     const factory = this.usePairFactory();
     return proxy
-      ? call(factory, 'getRoutablePair', lendable, proxy, tradable)
-      : call(factory, 'getPair', lendable, tradable);
+      ? this.core.useCall(factory, 'getRoutablePair', lendable, proxy, tradable)
+      : this.core.useCall(factory, 'getPair', lendable, tradable);
   }
 
   @MemoryCache()
@@ -69,11 +68,10 @@ export class Pairs extends CoreRelevant<
     shortable: string,
     proxy?: string
   ): Promise<string> {
-    const call = this.core.useCall.bind(this.core);
     const factory = this.usePairFactory();
     return proxy
-      ? call(factory, 'getRoutableShortingPair', lendable, proxy, shortable)
-      : call(factory, 'getShortingPair', lendable, shortable);
+      ? this.core.useCall(factory, 'getRoutableShortingPair', lendable, proxy, shortable)
+      : this.core.useCall(factory, 'getShortingPair', lendable, shortable);
   }
 
   useAllTradables(blockTag?: BlockTag) {
