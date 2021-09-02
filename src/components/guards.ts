@@ -1,4 +1,3 @@
-import { MemoryCache } from 'ts-method-cache';
 import { NewPriceGuardFactory__factory } from '../dependencies/protocol';
 import '../helpers/math';
 import { InferContext } from './abstract';
@@ -23,7 +22,6 @@ export class Guards extends CoreRelevant<
     super(context);
   }
 
-  @MemoryCache()
   useFactory() {
     return this.core.useContract(
       NewPriceGuardFactory__factory,

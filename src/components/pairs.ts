@@ -31,7 +31,6 @@ export class Pairs extends CoreRelevant<
     return this.context.reserves;
   }
 
-  @MemoryCache()
   usePairFactory() {
     return this.core.useContract(
       PairFactory__factory,
@@ -39,7 +38,6 @@ export class Pairs extends CoreRelevant<
     );
   }
 
-  @MemoryCache()
   private _useAllCached(
     block: number,
     selector: 'getAllTradables' | 'getAllShortables' | 'getAllProxyLendables'
@@ -50,7 +48,6 @@ export class Pairs extends CoreRelevant<
       .then(mapAll(byteToAddress));
   }
 
-  @MemoryCache()
   private _useLongPairCached(
     lendable: string,
     tradable: string,
@@ -62,7 +59,6 @@ export class Pairs extends CoreRelevant<
       : this.core.useCall(factory, 'getPair', lendable, tradable);
   }
 
-  @MemoryCache()
   private _useShortPairCached(
     lendable: string,
     shortable: string,

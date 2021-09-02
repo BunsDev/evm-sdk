@@ -1,5 +1,4 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { MemoryCache } from 'ts-method-cache';
 import {
   PriceFeed,
   PriceFeedFactory__factory,
@@ -20,7 +19,6 @@ export class PriceFeeds extends CoreRelevant<{
     super(context);
   }
 
-  @MemoryCache()
   useFactory() {
     return this.core.useContract(
       PriceFeedFactory__factory,

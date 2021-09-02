@@ -1,9 +1,8 @@
 import { AddressZero } from '@ethersproject/constants';
-import { MemoryCache } from 'ts-method-cache';
 import {
   Reserve,
   ReserveFactory__factory,
-  Reserve__factory,
+  Reserve__factory
 } from '../dependencies/protocol';
 import { byteToAddress, mapAll } from '../helpers/utils';
 import { BlockTag } from '../types';
@@ -19,7 +18,6 @@ export class Reserves extends CoreRelevant<{
     super(context);
   }
 
-  @MemoryCache()
   useReserveFactory() {
     return this.core.useContract(
       ReserveFactory__factory,
@@ -27,7 +25,6 @@ export class Reserves extends CoreRelevant<{
     );
   }
 
-  @MemoryCache()
   private _useAllCached(block: number) {
     console.log(`getting new lendables on ${block}`);
     return this.core
@@ -35,7 +32,6 @@ export class Reserves extends CoreRelevant<{
       .then(mapAll(byteToAddress));
   }
 
-  @MemoryCache()
   private _useReserveCached(lendable: string): Promise<string> {
     const factory = this.useReserveFactory();
     return this.core.useCall(factory, 'getReserve', lendable);
