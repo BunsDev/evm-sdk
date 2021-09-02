@@ -17,7 +17,7 @@
     "build:node": "ENV_TYPE=node tsdx build --target node --format cjs --name index",
     "test": "tsdx test",
     "lint": "tsdx lint",
-    "prepare": "tsdx build && ./scripts/types.sh",
+    "prepare": "node ./scripts/build.js",
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
