@@ -70,7 +70,7 @@ moveFile('dist-browser', 'dist/browser', 'index.js.map');
 // therefore we move and rename it to 'dist/types'
 moveFile('dist-browser', 'dist/types');
 
-proc.execSync('npm run prepare');
+proc.execSync('./node_modules/.bin/tsdx build');
 proc.execSync('./scripts/types.sh');
 
 console.log('Build finished!');
