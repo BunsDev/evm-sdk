@@ -1,11 +1,10 @@
 import { AddressZero } from '@ethersproject/constants';
-import { MemoryCache } from 'ts-method-cache';
 import {
   Pair,
   PairFactory__factory,
   Pair__factory,
   ShortingPair,
-  ShortingPair__factory,
+  ShortingPair__factory
 } from '../dependencies/protocol';
 import { byteToAddress, mapAll } from '../helpers/utils';
 import { BlockTag } from '../types';
