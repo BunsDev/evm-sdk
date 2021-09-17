@@ -6,4 +6,5 @@ export * from "./pairs"
 export * from "./parameters"
 export * from "./referral"
 export * from "./reserves"
+export * from './swap'
 export * from './tokens'

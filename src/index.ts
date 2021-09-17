@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import {
-  Core, Guards, Pairs, PriceFeeds, Reserves, Tokens
+  Core, Guards, Pairs, PriceFeeds, Reserves, Swap, Tokens
 } from './components';
 import { InferParams } from './components/abstract';
 
@@ -20,6 +20,7 @@ export class Context {
   readonly guards: Guards;
   readonly pairs: Pairs;
   readonly reserves: Reserves;
+  readonly swap: Swap;
 
   constructor(
     public readonly provider: JsonRpcProvider,
@@ -28,7 +29,8 @@ export class Context {
       InferParams<PriceFeeds> &
       InferParams<Guards> &
       InferParams<Pairs> &
-      InferParams<Reserves>
+      InferParams<Reserves> &
+      InferParams<Swap>
   ) {
     this.core = new Core(this);
     this.tokens = new Tokens(this);
@@ -36,5 +38,6 @@ export class Context {
     this.guards = new Guards(this);
     this.pairs = new Pairs(this);
     this.reserves = new Reserves(this);
+    this.swap = new Swap(this);
   }
 }
