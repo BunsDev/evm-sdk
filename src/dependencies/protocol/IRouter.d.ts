@@ -31,18 +31,7 @@ interface IRouterInterface extends ethers.utils.Interface {
     "calculateProxyBalance(address,address,address,address,uint256)": FunctionFragment;
     "calculateProxyShortBalance(address,address,address,address,uint256)": FunctionFragment;
     "calculateShortBalance(address,address,address,uint256)": FunctionFragment;
-    "closePosition(uint256,uint256,address,address,address,uint256)": FunctionFragment;
-    "closePositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
-    "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)": FunctionFragment;
-    "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
-    "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
-    "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)": FunctionFragment;
-    "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
-    "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
-    "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
-    "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
-    "closeShortPosition(uint256,uint256,address,address,address,uint256)": FunctionFragment;
-    "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
+    "closePosition(tuple)": FunctionFragment;
     "deposit(address,uint256,address)": FunctionFragment;
     "depositETH(address)": FunctionFragment;
     "depositShortable(address,uint256,address)": FunctionFragment;
@@ -50,18 +39,7 @@ interface IRouterInterface extends ethers.utils.Interface {
     "getProxyPosition(address,address,address,address)": FunctionFragment;
     "getProxyShortPosition(address,address,address,address)": FunctionFragment;
     "getShortPosition(address,address,address)": FunctionFragment;
-    "openPosition(uint256,uint256,uint256,address,address,address,uint256)": FunctionFragment;
-    "openPositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
-    "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)": FunctionFragment;
-    "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
-    "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
-    "openProxyPositionETH(uint256,uint256,address,address,address,uint256)": FunctionFragment;
-    "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
-    "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
-    "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
-    "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
-    "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)": FunctionFragment;
-    "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
+    "openPosition(tuple)": FunctionFragment;
     "pairFactory()": FunctionFragment;
     "reserveFactory()": FunctionFragment;
     "stake(address,uint256,uint16,address)": FunctionFragment;
@@ -110,108 +88,20 @@ interface IRouterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "closePosition",
-    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closePositionETH",
-    values: [BigNumberish, BigNumberish, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closePositionETHWithReferrer",
-    values: [BigNumberish, BigNumberish, string, string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closePositionWithReferrer",
     values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeProxyPosition",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeProxyPositionETH",
-    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeProxyPositionETHWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeProxyPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeProxyShortPosition",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeProxyShortPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeShortPosition",
-    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "closeShortPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
+      {
+        short: boolean;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      }
     ]
   ): string;
   encodeFunctionData(
@@ -242,129 +132,26 @@ interface IRouterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "openPosition",
     values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openPositionETH",
-    values: [BigNumberish, BigNumberish, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openPositionETHWithReferrer",
-    values: [BigNumberish, BigNumberish, string, string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openProxyPosition",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openProxyPositionETH",
-    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openProxyPositionETHWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openProxyPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openProxyShortPosition",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openProxyShortPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openShortPosition",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openShortPositionWithReferrer",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      string,
-      BigNumberish,
-      string
+      {
+        short: boolean;
+        amountIn: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        convertFromNative: boolean;
+      }
     ]
   ): string;
   encodeFunctionData(
@@ -449,50 +236,6 @@ interface IRouterInterface extends ethers.utils.Interface {
     functionFragment: "closePosition",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "closePositionETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closePositionETHWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closePositionWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeProxyPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeProxyPositionETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeProxyPositionETHWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeProxyPositionWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeProxyShortPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeProxyShortPositionWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeShortPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeShortPositionWithReferrer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositETH", data: BytesLike): Result;
   decodeFunctionResult(
@@ -517,50 +260,6 @@ interface IRouterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "openPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openPositionETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openPositionETHWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openPositionWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openProxyPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openProxyPositionETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openProxyPositionETHWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openProxyPositionWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openProxyShortPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openProxyShortPositionWithReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openShortPosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "openShortPositionWithReferrer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -770,130 +469,19 @@ export class IRouter extends BaseContract {
     >;
 
     closePosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closePositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closePositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closePositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeProxyPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeProxyPositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeProxyPositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeProxyShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    closeShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -1115,139 +703,27 @@ export class IRouter extends BaseContract {
     >;
 
     openPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        convertFromNative: boolean;
+      },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openProxyPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openProxyPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openProxyPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openProxyShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    openShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     pairFactory(
@@ -1438,130 +914,19 @@ export class IRouter extends BaseContract {
   >;
 
   closePosition(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closePositionETH(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closePositionETHWithReferrer(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closePositionWithReferrer(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeProxyPosition(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeProxyPositionETH(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeProxyPositionETHWithReferrer(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeProxyPositionWithReferrer(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeProxyShortPosition(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeProxyShortPositionWithReferrer(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeShortPosition(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  closeShortPositionWithReferrer(
-    amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
+    request: {
+      short: boolean;
+      amountIn: BigNumberish;
+      amountOutMin: BigNumberish;
+      lendable: string;
+      proxy: string;
+      tradable: string;
+      trader: string;
+      deadline: BigNumberish;
+      referrer: string;
+      permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      convertToNative: boolean;
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1695,139 +1060,27 @@ export class IRouter extends BaseContract {
   >;
 
   openPosition(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openPositionETH(
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
+    request: {
+      short: boolean;
+      amountIn: BigNumberish;
+      leverageFactor: BigNumberish;
+      amountOutMin: BigNumberish;
+      lendable: string;
+      proxy: string;
+      tradable: string;
+      trader: string;
+      deadline: BigNumberish;
+      referrer: string;
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      };
+      convertFromNative: boolean;
+    },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openPositionETHWithReferrer(
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openPositionWithReferrer(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openProxyPosition(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openProxyPositionETH(
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openProxyPositionETHWithReferrer(
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openProxyPositionWithReferrer(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openProxyShortPosition(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openProxyShortPositionWithReferrer(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    proxyLendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openShortPosition(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  openShortPositionWithReferrer(
-    amountIn: BigNumberish,
-    leverageFactor: BigNumberish,
-    amountOutMin: BigNumberish,
-    lendable: string,
-    shortable: string,
-    trader: string,
-    deadline: BigNumberish,
-    referrer: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   pairFactory(
@@ -2018,130 +1271,19 @@ export class IRouter extends BaseContract {
     >;
 
     closePosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closePositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closePositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closePositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeProxyPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeProxyPositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeProxyPositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeProxyShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    closeShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2272,138 +1414,26 @@ export class IRouter extends BaseContract {
     >;
 
     openPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openProxyPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openProxyPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openProxyPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openProxyShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    openShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        convertFromNative: boolean;
+      },
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2531,130 +1561,19 @@ export class IRouter extends BaseContract {
     ): Promise<BigNumber>;
 
     closePosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closePositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closePositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closePositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeProxyPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeProxyPositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeProxyPositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeProxyShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    closeShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -2708,139 +1627,27 @@ export class IRouter extends BaseContract {
     ): Promise<BigNumber>;
 
     openPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        convertFromNative: boolean;
+      },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openProxyPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openProxyPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openProxyPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openProxyShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    openShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     pairFactory(
@@ -2976,130 +1783,19 @@ export class IRouter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     closePosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closePositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closePositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closePositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeProxyPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeProxyPositionETH(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeProxyPositionETHWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeProxyShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeShortPosition(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    closeShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -3153,139 +1849,27 @@ export class IRouter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     openPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
+      request: {
+        short: boolean;
+        amountIn: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        convertFromNative: boolean;
+      },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openProxyPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openProxyPositionETH(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openProxyPositionETHWithReferrer(
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openProxyPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openProxyShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openProxyShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      proxyLendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openShortPosition(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openShortPositionWithReferrer(
-      amountIn: BigNumberish,
-      leverageFactor: BigNumberish,
-      amountOutMin: BigNumberish,
-      lendable: string,
-      shortable: string,
-      trader: string,
-      deadline: BigNumberish,
-      referrer: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     pairFactory(

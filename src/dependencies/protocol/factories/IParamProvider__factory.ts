@@ -64,6 +64,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "guardedPriceSigner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "liquidationMargin",
     outputs: [
       {

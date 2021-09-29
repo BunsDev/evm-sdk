@@ -37,6 +37,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20Detailed__factory>;
     getContractFactory(
+      name: "IERC20Permit",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20Permit__factory>;
+    getContractFactory(
       name: "Multicall",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Multicall__factory>;
@@ -197,6 +201,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IRouter__factory>;
     getContractFactory(
+      name: "IRouterOld",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRouterOld__factory>;
+    getContractFactory(
       name: "IShortingPair",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IShortingPair__factory>;
@@ -273,6 +281,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ShortingPairNext__factory>;
     getContractFactory(
+      name: "IPairExplorerV1",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPairExplorerV1__factory>;
+    getContractFactory(
       name: "IPairFactoryV1",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IPairFactoryV1__factory>;
@@ -300,6 +312,10 @@ declare module "hardhat/types/runtime" {
       name: "IRouterV1",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IRouterV1__factory>;
+    getContractFactory(
+      name: "PairExplorerV1",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PairExplorerV1__factory>;
     getContractFactory(
       name: "PairFactoryStorageV1",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -348,6 +364,14 @@ declare module "hardhat/types/runtime" {
       name: "ReserveV1",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReserveV1__factory>;
+    getContractFactory(
+      name: "RouterV1",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RouterV1__factory>;
+    getContractFactory(
+      name: "ERC20Permit",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC20Permit__factory>;
     getContractFactory(
       name: "AbstractPriceFeed",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -484,6 +508,10 @@ declare module "hardhat/types/runtime" {
       name: "Router",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Router__factory>;
+    getContractFactory(
+      name: "RouterOld",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RouterOld__factory>;
     getContractFactory(
       name: "ShortingPair",
       signerOrOptions?: ethers.Signer | FactoryOptions

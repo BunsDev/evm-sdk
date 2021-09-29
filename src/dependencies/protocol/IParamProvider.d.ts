@@ -25,6 +25,7 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     "baseBorrowRate()": FunctionFragment;
     "excessSlope()": FunctionFragment;
     "feeToken()": FunctionFragment;
+    "guardedPriceSigner()": FunctionFragment;
     "liquidationMargin()": FunctionFragment;
     "liquidationReward()": FunctionFragment;
     "maxLeverageFactor()": FunctionFragment;
@@ -58,6 +59,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "feeToken", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "guardedPriceSigner",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "liquidationMargin",
     values?: undefined
@@ -147,6 +152,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "feeToken", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "guardedPriceSigner",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "liquidationMargin",
     data: BytesLike
@@ -275,6 +284,8 @@ export class IParamProvider extends BaseContract {
 
     feeToken(overrides?: CallOverrides): Promise<[string]>;
 
+    guardedPriceSigner(overrides?: CallOverrides): Promise<[string]>;
+
     liquidationMargin(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     liquidationReward(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -331,6 +342,8 @@ export class IParamProvider extends BaseContract {
 
   feeToken(overrides?: CallOverrides): Promise<string>;
 
+  guardedPriceSigner(overrides?: CallOverrides): Promise<string>;
+
   liquidationMargin(overrides?: CallOverrides): Promise<BigNumber>;
 
   liquidationReward(overrides?: CallOverrides): Promise<BigNumber>;
@@ -386,6 +399,8 @@ export class IParamProvider extends BaseContract {
     excessSlope(overrides?: CallOverrides): Promise<BigNumber>;
 
     feeToken(overrides?: CallOverrides): Promise<string>;
+
+    guardedPriceSigner(overrides?: CallOverrides): Promise<string>;
 
     liquidationMargin(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -444,6 +459,8 @@ export class IParamProvider extends BaseContract {
 
     feeToken(overrides?: CallOverrides): Promise<BigNumber>;
 
+    guardedPriceSigner(overrides?: CallOverrides): Promise<BigNumber>;
+
     liquidationMargin(overrides?: CallOverrides): Promise<BigNumber>;
 
     liquidationReward(overrides?: CallOverrides): Promise<BigNumber>;
@@ -500,6 +517,10 @@ export class IParamProvider extends BaseContract {
     excessSlope(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     feeToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    guardedPriceSigner(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     liquidationMargin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

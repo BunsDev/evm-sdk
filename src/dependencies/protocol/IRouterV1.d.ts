@@ -23,8 +23,6 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IRouterV1Interface extends ethers.utils.Interface {
   functions: {
     "WETH()": FunctionFragment;
-    "calculateBalance(address,address,address,uint256)": FunctionFragment;
-    "calculateOpenPosition(address,address,uint256,uint256)": FunctionFragment;
     "closePosition(uint256,uint256,address,address,address,uint256)": FunctionFragment;
     "closePositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
     "deposit(address,uint256,address)": FunctionFragment;
@@ -42,14 +40,6 @@ interface IRouterV1Interface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "calculateBalance",
-    values: [string, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "calculateOpenPosition",
-    values: [string, string, BigNumberish, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "closePosition",
     values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
@@ -113,14 +103,6 @@ interface IRouterV1Interface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "calculateBalance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "calculateOpenPosition",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "closePosition",
     data: BytesLike
@@ -211,35 +193,6 @@ export class IRouterV1 extends BaseContract {
 
   functions: {
     WETH(overrides?: CallOverrides): Promise<[string]>;
-
-    calculateBalance(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    calculateOpenPosition(
-      lendable: string,
-      tradable: string,
-      amount: BigNumberish,
-      leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
 
     closePosition(
       amountIn: BigNumberish,
@@ -337,35 +290,6 @@ export class IRouterV1 extends BaseContract {
 
   WETH(overrides?: CallOverrides): Promise<string>;
 
-  calculateBalance(
-    lendable: string,
-    tradable: string,
-    trader: string,
-    amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
-
-  calculateOpenPosition(
-    lendable: string,
-    tradable: string,
-    amount: BigNumberish,
-    leverageFactor: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
-
   closePosition(
     amountIn: BigNumberish,
     amountOutMin: BigNumberish,
@@ -462,35 +386,6 @@ export class IRouterV1 extends BaseContract {
   callStatic: {
     WETH(overrides?: CallOverrides): Promise<string>;
 
-    calculateBalance(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    calculateOpenPosition(
-      lendable: string,
-      tradable: string,
-      amount: BigNumberish,
-      leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
-
     closePosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -578,22 +473,6 @@ export class IRouterV1 extends BaseContract {
 
   estimateGas: {
     WETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    calculateBalance(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    calculateOpenPosition(
-      lendable: string,
-      tradable: string,
-      amount: BigNumberish,
-      leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     closePosition(
       amountIn: BigNumberish,
@@ -691,22 +570,6 @@ export class IRouterV1 extends BaseContract {
 
   populateTransaction: {
     WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    calculateBalance(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    calculateOpenPosition(
-      lendable: string,
-      tradable: string,
-      amount: BigNumberish,
-      leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     closePosition(
       amountIn: BigNumberish,

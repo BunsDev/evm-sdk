@@ -36,7 +36,7 @@ interface IShortingPairInterface extends ethers.utils.Interface {
     "getTotalLoan()": FunctionFragment;
     "initialize(address,address,address,address[],string,string)": FunctionFragment;
     "liquidatePosition(address,address)": FunctionFragment;
-    "openPosition(address,uint256,uint256)": FunctionFragment;
+    "openPosition(address,uint256,uint256,address,tuple)": FunctionFragment;
     "openPositionWithReferrer(address,uint256,uint256,address)": FunctionFragment;
     "positionCosts(address)": FunctionFragment;
     "underlyingBalanceOf(address)": FunctionFragment;
@@ -98,7 +98,19 @@ interface IShortingPairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "openPosition",
-    values: [string, BigNumberish, BigNumberish]
+    values: [
+      string,
+      BigNumberish,
+      BigNumberish,
+      string,
+      {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "openPositionWithReferrer",
@@ -303,6 +315,14 @@ export class IShortingPair extends BaseContract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -402,6 +422,14 @@ export class IShortingPair extends BaseContract {
     trader: string,
     leverageFactor: BigNumberish,
     amountOutMin: BigNumberish,
+    referrer: string,
+    guardedPrice: {
+      minDeposit: BigNumberish;
+      minPrice: BigNumberish;
+      maxPrice: BigNumberish;
+      deadline: BigNumberish;
+      signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -501,6 +529,14 @@ export class IShortingPair extends BaseContract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -637,6 +673,14 @@ export class IShortingPair extends BaseContract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -738,6 +782,14 @@ export class IShortingPair extends BaseContract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

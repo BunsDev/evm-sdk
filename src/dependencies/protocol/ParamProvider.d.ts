@@ -28,6 +28,7 @@ interface ParamProviderInterface extends ethers.utils.Interface {
     "baseBorrowRate()": FunctionFragment;
     "excessSlope()": FunctionFragment;
     "feeToken()": FunctionFragment;
+    "guardedPriceSigner()": FunctionFragment;
     "initialize(address,address,uint256,uint256)": FunctionFragment;
     "liquidationMargin()": FunctionFragment;
     "liquidationReward()": FunctionFragment;
@@ -82,6 +83,10 @@ interface ParamProviderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "feeToken", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "guardedPriceSigner",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [string, string, BigNumberish, BigNumberish]
@@ -228,6 +233,10 @@ interface ParamProviderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "feeToken", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "guardedPriceSigner",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "liquidationMargin",
@@ -414,6 +423,8 @@ export class ParamProvider extends BaseContract {
 
     feeToken(overrides?: CallOverrides): Promise<[string]>;
 
+    guardedPriceSigner(overrides?: CallOverrides): Promise<[string]>;
+
     initialize(
       owner: string,
       paramGovernance: string,
@@ -542,6 +553,8 @@ export class ParamProvider extends BaseContract {
   excessSlope(overrides?: CallOverrides): Promise<BigNumber>;
 
   feeToken(overrides?: CallOverrides): Promise<string>;
+
+  guardedPriceSigner(overrides?: CallOverrides): Promise<string>;
 
   initialize(
     owner: string,
@@ -672,6 +685,8 @@ export class ParamProvider extends BaseContract {
 
     feeToken(overrides?: CallOverrides): Promise<string>;
 
+    guardedPriceSigner(overrides?: CallOverrides): Promise<string>;
+
     initialize(
       owner: string,
       paramGovernance: string,
@@ -798,6 +813,8 @@ export class ParamProvider extends BaseContract {
     excessSlope(overrides?: CallOverrides): Promise<BigNumber>;
 
     feeToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    guardedPriceSigner(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
       owner: string,
@@ -928,6 +945,10 @@ export class ParamProvider extends BaseContract {
     excessSlope(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     feeToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    guardedPriceSigner(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     initialize(
       owner: string,

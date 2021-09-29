@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface PairInterface extends ethers.utils.Interface {
   functions: {
+    "DOMAIN_SEPARATOR()": FunctionFragment;
     "REVISION()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -43,8 +44,10 @@ interface PairInterface extends ethers.utils.Interface {
     "initialize(address,address,address,address[],string,string)": FunctionFragment;
     "liquidatePosition(address,address)": FunctionFragment;
     "name()": FunctionFragment;
-    "openPosition(address,uint256,uint256)": FunctionFragment;
+    "nonces(address)": FunctionFragment;
+    "openPosition(address,uint256,uint256,address,tuple)": FunctionFragment;
     "openPositionWithReferrer(address,uint256,uint256,address)": FunctionFragment;
+    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "positionCosts(address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -52,6 +55,10 @@ interface PairInterface extends ethers.utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "DOMAIN_SEPARATOR",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allowance",
@@ -122,13 +129,38 @@ interface PairInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
   encodeFunctionData(
     functionFragment: "openPosition",
-    values: [string, BigNumberish, BigNumberish]
+    values: [
+      string,
+      BigNumberish,
+      BigNumberish,
+      string,
+      {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "openPositionWithReferrer",
     values: [string, BigNumberish, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "permit",
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "positionCosts",
@@ -148,6 +180,10 @@ interface PairInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "DOMAIN_SEPARATOR",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
@@ -206,6 +242,7 @@ interface PairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "openPosition",
     data: BytesLike
@@ -214,6 +251,7 @@ interface PairInterface extends ethers.utils.Interface {
     functionFragment: "openPositionWithReferrer",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "positionCosts",
     data: BytesLike
@@ -286,6 +324,8 @@ export class Pair extends BaseContract {
   interface: PairInterface;
 
   functions: {
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
+
     REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     allowance(
@@ -380,10 +420,20 @@ export class Pair extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
+    nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
     openPosition(
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -392,6 +442,17 @@ export class Pair extends BaseContract {
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
       referrer: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    permit(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -422,6 +483,8 @@ export class Pair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
   REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -517,10 +580,20 @@ export class Pair extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
+  nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
   openPosition(
     trader: string,
     leverageFactor: BigNumberish,
     amountOutMin: BigNumberish,
+    referrer: string,
+    guardedPrice: {
+      minDeposit: BigNumberish;
+      minPrice: BigNumberish;
+      maxPrice: BigNumberish;
+      deadline: BigNumberish;
+      signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -529,6 +602,17 @@ export class Pair extends BaseContract {
     leverageFactor: BigNumberish,
     amountOutMin: BigNumberish,
     referrer: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  permit(
+    owner: string,
+    spender: string,
+    value: BigNumberish,
+    deadline: BigNumberish,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -560,6 +644,8 @@ export class Pair extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
+
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
@@ -654,10 +740,20 @@ export class Pair extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
+    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     openPosition(
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -668,6 +764,17 @@ export class Pair extends BaseContract {
       referrer: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    permit(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     positionCosts(
       trader: string,
@@ -752,6 +859,8 @@ export class Pair extends BaseContract {
   };
 
   estimateGas: {
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
+
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
@@ -846,10 +955,20 @@ export class Pair extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
+    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     openPosition(
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -858,6 +977,17 @@ export class Pair extends BaseContract {
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
       referrer: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    permit(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -885,6 +1015,8 @@ export class Pair extends BaseContract {
   };
 
   populateTransaction: {
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
@@ -988,10 +1120,23 @@ export class Pair extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    nonces(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     openPosition(
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      referrer: string,
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1000,6 +1145,17 @@ export class Pair extends BaseContract {
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
       referrer: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    permit(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

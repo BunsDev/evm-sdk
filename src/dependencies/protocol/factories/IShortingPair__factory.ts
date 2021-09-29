@@ -413,6 +413,60 @@ const _abi = [
         name: "amountOutMin",
         type: "uint256",
       },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "minDeposit",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "minPrice",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "maxPrice",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+          {
+            components: [
+              {
+                internalType: "uint8",
+                name: "v",
+                type: "uint8",
+              },
+              {
+                internalType: "bytes32",
+                name: "r",
+                type: "bytes32",
+              },
+              {
+                internalType: "bytes32",
+                name: "s",
+                type: "bytes32",
+              },
+            ],
+            internalType: "struct Signature",
+            name: "signature",
+            type: "tuple",
+          },
+        ],
+        internalType: "struct IPair.GuardedPrice",
+        name: "guardedPrice",
+        type: "tuple",
+      },
     ],
     name: "openPosition",
     outputs: [
