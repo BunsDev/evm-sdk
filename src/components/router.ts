@@ -1,4 +1,3 @@
-import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumberish } from '@ethersproject/bignumber';
 import { BytesLike } from '@ethersproject/bytes';
 import { ethers, Wallet } from 'ethers';
