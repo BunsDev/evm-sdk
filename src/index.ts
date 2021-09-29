@@ -1,17 +1,24 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import {
-  Core, Guards, Pairs, PriceFeeds, Reserves, Swap, Tokens
+  Core,
+  Guards,
+  Pairs,
+  PriceFeeds,
+  Reserves,
+  Swap,
+  Tokens,
+  Router,
 } from './components';
 import { InferParams } from './components/abstract';
 
-export * from './helpers/utils'
-export * from './helpers/math'
+export * from './helpers/utils';
+export * from './helpers/math';
 
-import * as governance from './dependencies/governance'
-import * as priceFeed from './dependencies/price-feed'
-import * as protocol from './dependencies/protocol'
+import * as governance from './dependencies/governance';
+import * as priceFeed from './dependencies/price-feed';
+import * as protocol from './dependencies/protocol';
 
-export { governance, priceFeed, protocol}
+export { governance, priceFeed, protocol };
 
 export class Context {
   readonly tokens: Tokens;
@@ -21,6 +28,7 @@ export class Context {
   readonly pairs: Pairs;
   readonly reserves: Reserves;
   readonly swap: Swap;
+  readonly router: Router;
 
   constructor(
     public readonly provider: JsonRpcProvider,
@@ -30,7 +38,8 @@ export class Context {
       InferParams<Guards> &
       InferParams<Pairs> &
       InferParams<Reserves> &
-      InferParams<Swap>
+      InferParams<Swap> &
+      InferParams<Router>
   ) {
     this.core = new Core(this);
     this.tokens = new Tokens(this);
@@ -39,5 +48,6 @@ export class Context {
     this.pairs = new Pairs(this);
     this.reserves = new Reserves(this);
     this.swap = new Swap(this);
+    this.router = new Router(this);
   }
 }

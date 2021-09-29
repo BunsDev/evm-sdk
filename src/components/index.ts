@@ -8,3 +8,4 @@ export * from "./referral"
 export * from "./reserves"
 export * from './swap'
 export * from './tokens'
+export * from './router'
