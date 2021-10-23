@@ -1,6 +1,6 @@
 import { pack, keccak256 } from '@ethersproject/solidity';
 import { getCreate2Address } from 'ethers/lib/utils';
-import { PancakePair__factory } from '../dependencies/protocol';
+import { PancakePair__factory, PancakeRouter, PancakeRouter__factory } from '../dependencies/protocol';
 import { InferContext } from './abstract';
 import { CoreRelevant } from './core';
 import { Reserves } from './reserves';
@@ -15,10 +15,14 @@ export class Swap extends CoreRelevant<
     reserves: Reserves;
   }
 > {
-  public static REQUIRED_ADDRESSES = ['swapFactory', 'swapCodehash'] as const;
+  public static REQUIRED_ADDRESSES = ['swapFactory', 'swapCodehash', 'swapRouter'] as const;
 
   constructor(context: InferContext<Swap>) {
     super(context);
+  }
+
+  get router(): PancakeRouter {
+    return this.core.useContract(PancakeRouter__factory, this.params.contracts.swapRouter);
   }
 
   async useReserves(

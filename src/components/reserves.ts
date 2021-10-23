@@ -25,8 +25,7 @@ export class Reserves extends CoreRelevant<{
     );
   }
 
-  private _useAllCached(block: number) {
-    console.log(`getting new lendables on ${block}`);
+  private _useAllCached(_: number) {
     return this.core
       .useCall(this.useReserveFactory(), 'getAllLendables')
       .then(mapAll(byteToAddress));
