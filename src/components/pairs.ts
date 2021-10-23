@@ -38,10 +38,9 @@ export class Pairs extends CoreRelevant<
   }
 
   private _useAllCached(
-    block: number,
+    _: number,
     selector: 'getAllTradables' | 'getAllShortables' | 'getAllProxyLendables'
   ) {
-    console.log(`getting new ${selector} on ${block}`);
     return this.core
       .useCall(this.usePairFactory(), selector)
       .then(mapAll(byteToAddress));
