@@ -20,7 +20,7 @@ export class Pairs extends CoreRelevant<
     reserves: Reserves;
   }
 > {
-  public static REQUIRED_ADDRESSES = ['pairFactory'] as const;
+  public static REQUIRED_ADDRESSES = ['pairFactory', 'treasurer'] as const;
 
   constructor(context: InferContext<Pairs>) {
     super(context);
