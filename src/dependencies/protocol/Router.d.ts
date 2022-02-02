@@ -18,7 +18,7 @@ import {
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface RouterInterface extends ethers.utils.Interface {
   functions: {
@@ -32,7 +32,7 @@ interface RouterInterface extends ethers.utils.Interface {
     "calculateProxyBalance(address,address,address,address,uint256)": FunctionFragment;
     "calculateProxyShortBalance(address,address,address,address,uint256)": FunctionFragment;
     "calculateShortBalance(address,address,address,uint256)": FunctionFragment;
-    "closePosition(tuple)": FunctionFragment;
+    "closePosition((bool,uint256,uint256,address,address,address,address,uint256,address,(uint8,bytes32,bytes32),bool))": FunctionFragment;
     "deposit(address,uint256,address)": FunctionFragment;
     "depositETH(address)": FunctionFragment;
     "depositShortable(address,uint256,address)": FunctionFragment;
@@ -43,7 +43,8 @@ interface RouterInterface extends ethers.utils.Interface {
     "getShortPosition(address,address,address)": FunctionFragment;
     "incentivize(address,uint256)": FunctionFragment;
     "initialize(address,address,address,address,address,address)": FunctionFragment;
-    "openPosition(tuple)": FunctionFragment;
+    "openPosition((uint256,uint256,uint256,address,address,address,address,uint256,address,(uint256,uint256,uint256,uint256,(uint8,bytes32,bytes32)),(uint256,uint256,uint256,(uint8,bytes32,bytes32)),uint256,bool))": FunctionFragment;
+    "openShortPosition((uint256,uint256,uint256,uint256,address,address,address,address,uint256,address,(uint256,uint256,uint256,uint256,(uint8,bytes32,bytes32)),(uint256,uint256,uint256,(uint8,bytes32,bytes32)),uint256,bool))": FunctionFragment;
     "pairFactory()": FunctionFragment;
     "reserveFactory()": FunctionFragment;
     "stake(address,uint256,uint16,address)": FunctionFragment;
@@ -52,9 +53,7 @@ interface RouterInterface extends ethers.utils.Interface {
     "sweepReserveFee(address)": FunctionFragment;
     "sweepShortingReserveFee(address)": FunctionFragment;
     "unstake(address,address)": FunctionFragment;
-    "withdraw(address,uint256,address)": FunctionFragment;
-    "withdrawETH(uint256,address)": FunctionFragment;
-    "withdrawShortable(address,uint256,address)": FunctionFragment;
+    "withdraw((address,uint256,address,uint256,(uint8,bytes32,bytes32),bool))": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
@@ -150,7 +149,6 @@ interface RouterInterface extends ethers.utils.Interface {
     functionFragment: "openPosition",
     values: [
       {
-        short: boolean;
         amountIn: BigNumberish;
         leverageFactor: BigNumberish;
         amountOutMin: BigNumberish;
@@ -167,6 +165,45 @@ interface RouterInterface extends ethers.utils.Interface {
           deadline: BigNumberish;
           signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
         };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
+        convertFromNative: boolean;
+      }
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openShortPosition",
+    values: [
+      {
+        amountIn: BigNumberish;
+        baseBorrowAmount: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
         convertFromNative: boolean;
       }
     ]
@@ -205,15 +242,16 @@ interface RouterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
-    values: [string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "withdrawETH",
-    values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "withdrawShortable",
-    values: [string, BigNumberish, string]
+    values: [
+      {
+        token: string;
+        amount: BigNumberish;
+        to: string;
+        deadline: BigNumberish;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      }
+    ]
   ): string;
 
   decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
@@ -287,6 +325,10 @@ interface RouterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "openShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "pairFactory",
     data: BytesLike
   ): Result;
@@ -310,14 +352,6 @@ interface RouterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "unstake", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawShortable",
-    data: BytesLike
-  ): Result;
 
   events: {};
 }
@@ -375,30 +409,16 @@ export class Router extends BaseContract {
       tradable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateOpenPosition(
       lendable: string,
       tradable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateOpenProxyPosition(
       lendable: string,
@@ -406,15 +426,8 @@ export class Router extends BaseContract {
       tradable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateOpenProxyShortPosition(
       lendable: string,
@@ -422,30 +435,16 @@ export class Router extends BaseContract {
       shortable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateOpenShortPosition(
       lendable: string,
       shortable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateProxyBalance(
       lendable: string,
@@ -453,15 +452,8 @@ export class Router extends BaseContract {
       tradable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateProxyShortBalance(
       lendable: string,
@@ -469,30 +461,16 @@ export class Router extends BaseContract {
       shortable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     calculateShortBalance(
       lendable: string,
       shortable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     closePosition(
       request: {
@@ -540,199 +518,31 @@ export class Router extends BaseContract {
       trader: string,
       lendable: string,
       tradable: string,
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     getProxyPosition(
       trader: string,
       lendable: string,
       proxyLendable: string,
       tradable: string,
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     getProxyShortPosition(
       trader: string,
       lendable: string,
       proxyLendable: string,
       shortable: string,
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     getShortPosition(
       trader: string,
       lendable: string,
       shortable: string,
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     incentivize(
       token: string,
@@ -752,7 +562,6 @@ export class Router extends BaseContract {
 
     openPosition(
       request: {
-        short: boolean;
         amountIn: BigNumberish;
         leverageFactor: BigNumberish;
         amountOutMin: BigNumberish;
@@ -769,6 +578,44 @@ export class Router extends BaseContract {
           deadline: BigNumberish;
           signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
         };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
+        convertFromNative: boolean;
+      },
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    openShortPosition(
+      request: {
+        amountIn: BigNumberish;
+        baseBorrowAmount: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
         convertFromNative: boolean;
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -807,22 +654,14 @@ export class Router extends BaseContract {
     ): Promise<ContractTransaction>;
 
     withdraw(
-      lendable: string,
-      amount: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawETH(
-      amount: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawShortable(
-      shortable: string,
-      amount: BigNumberish,
-      to: string,
+      request: {
+        token: string;
+        amount: BigNumberish;
+        to: string;
+        deadline: BigNumberish;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -836,30 +675,16 @@ export class Router extends BaseContract {
     tradable: string,
     trader: string,
     amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      amountOut: BigNumber;
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateOpenPosition(
     lendable: string,
     tradable: string,
     amount: BigNumberish,
     leverageFactor: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateOpenProxyPosition(
     lendable: string,
@@ -867,15 +692,8 @@ export class Router extends BaseContract {
     tradable: string,
     amount: BigNumberish,
     leverageFactor: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateOpenProxyShortPosition(
     lendable: string,
@@ -883,30 +701,16 @@ export class Router extends BaseContract {
     shortable: string,
     amount: BigNumberish,
     leverageFactor: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateOpenShortPosition(
     lendable: string,
     shortable: string,
     amount: BigNumberish,
     leverageFactor: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateProxyBalance(
     lendable: string,
@@ -914,15 +718,8 @@ export class Router extends BaseContract {
     tradable: string,
     trader: string,
     amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      amountOut: BigNumber;
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateProxyShortBalance(
     lendable: string,
@@ -930,30 +727,16 @@ export class Router extends BaseContract {
     shortable: string,
     trader: string,
     amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      amountOut: BigNumber;
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   calculateShortBalance(
     lendable: string,
     shortable: string,
     trader: string,
     amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      amountOut: BigNumber;
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   closePosition(
     request: {
@@ -1001,111 +784,31 @@ export class Router extends BaseContract {
     trader: string,
     lendable: string,
     tradable: string,
-    overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   getProxyPosition(
     trader: string,
     lendable: string,
     proxyLendable: string,
     tradable: string,
-    overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   getProxyShortPosition(
     trader: string,
     lendable: string,
     proxyLendable: string,
     shortable: string,
-    overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   getShortPosition(
     trader: string,
     lendable: string,
     shortable: string,
-    overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   incentivize(
     token: string,
@@ -1125,7 +828,6 @@ export class Router extends BaseContract {
 
   openPosition(
     request: {
-      short: boolean;
       amountIn: BigNumberish;
       leverageFactor: BigNumberish;
       amountOutMin: BigNumberish;
@@ -1142,6 +844,44 @@ export class Router extends BaseContract {
         deadline: BigNumberish;
         signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
       };
+      terminationConditions: {
+        stopLossPercentage: BigNumberish;
+        takeProfitPercentage: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      };
+      terminationReward: BigNumberish;
+      convertFromNative: boolean;
+    },
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  openShortPosition(
+    request: {
+      amountIn: BigNumberish;
+      baseBorrowAmount: BigNumberish;
+      leverageFactor: BigNumberish;
+      amountOutMin: BigNumberish;
+      lendable: string;
+      proxy: string;
+      tradable: string;
+      trader: string;
+      deadline: BigNumberish;
+      referrer: string;
+      guardedPrice: {
+        minDeposit: BigNumberish;
+        minPrice: BigNumberish;
+        maxPrice: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      };
+      terminationConditions: {
+        stopLossPercentage: BigNumberish;
+        takeProfitPercentage: BigNumberish;
+        deadline: BigNumberish;
+        signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      };
+      terminationReward: BigNumberish;
       convertFromNative: boolean;
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -1180,22 +920,14 @@ export class Router extends BaseContract {
   ): Promise<ContractTransaction>;
 
   withdraw(
-    lendable: string,
-    amount: BigNumberish,
-    to: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawETH(
-    amount: BigNumberish,
-    to: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawShortable(
-    shortable: string,
-    amount: BigNumberish,
-    to: string,
+    request: {
+      token: string;
+      amount: BigNumberish;
+      to: string;
+      deadline: BigNumberish;
+      permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+      convertToNative: boolean;
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1212,12 +944,12 @@ export class Router extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+      >;
 
     calculateOpenPosition(
       lendable: string,
@@ -1226,13 +958,30 @@ export class Router extends BaseContract {
       leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
+      ] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     calculateOpenProxyPosition(
       lendable: string,
@@ -1242,13 +991,30 @@ export class Router extends BaseContract {
       leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
+      ] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     calculateOpenProxyShortPosition(
       lendable: string,
@@ -1258,13 +1024,30 @@ export class Router extends BaseContract {
       leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
+      ] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     calculateOpenShortPosition(
       lendable: string,
@@ -1273,13 +1056,30 @@ export class Router extends BaseContract {
       leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
+      ] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     calculateProxyBalance(
       lendable: string,
@@ -1290,12 +1090,12 @@ export class Router extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+      >;
 
     calculateProxyShortBalance(
       lendable: string,
@@ -1306,12 +1106,12 @@ export class Router extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+      >;
 
     calculateShortBalance(
       lendable: string,
@@ -1321,12 +1121,12 @@ export class Router extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amountOut: BigNumber;
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+      >;
 
     closePosition(
       request: {
@@ -1381,18 +1181,30 @@ export class Router extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
       ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     getProxyPosition(
       trader: string,
@@ -1409,18 +1221,30 @@ export class Router extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
       ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     getProxyShortPosition(
       trader: string,
@@ -1437,18 +1261,30 @@ export class Router extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
       ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     getShortPosition(
       trader: string,
@@ -1464,18 +1300,30 @@ export class Router extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber
+        BigNumber,
+          [BigNumber, BigNumber, BigNumber, BigNumber] & {
+          expirationDate: BigNumber;
+          stopLossPercentage: BigNumber;
+          takeProfitPercentage: BigNumber;
+          terminationReward: BigNumber;
+        }
       ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+      terminationConditions: [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        expirationDate: BigNumber;
+        stopLossPercentage: BigNumber;
+        takeProfitPercentage: BigNumber;
+        terminationReward: BigNumber;
+      };
+    }
+      >;
 
     incentivize(
       token: string,
@@ -1495,7 +1343,6 @@ export class Router extends BaseContract {
 
     openPosition(
       request: {
-        short: boolean;
         amountIn: BigNumberish;
         leverageFactor: BigNumberish;
         amountOutMin: BigNumberish;
@@ -1512,6 +1359,44 @@ export class Router extends BaseContract {
           deadline: BigNumberish;
           signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
         };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
+        convertFromNative: boolean;
+      },
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openShortPosition(
+      request: {
+        amountIn: BigNumberish;
+        baseBorrowAmount: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
         convertFromNative: boolean;
       },
       overrides?: CallOverrides
@@ -1547,22 +1432,14 @@ export class Router extends BaseContract {
     ): Promise<void>;
 
     withdraw(
-      lendable: string,
-      amount: BigNumberish,
-      to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawETH(
-      amount: BigNumberish,
-      to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawShortable(
-      shortable: string,
-      amount: BigNumberish,
-      to: string,
+      request: {
+        token: string;
+        amount: BigNumberish;
+        to: string;
+        deadline: BigNumberish;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -1579,7 +1456,7 @@ export class Router extends BaseContract {
       tradable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateOpenPosition(
@@ -1587,7 +1464,7 @@ export class Router extends BaseContract {
       tradable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateOpenProxyPosition(
@@ -1596,7 +1473,7 @@ export class Router extends BaseContract {
       tradable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateOpenProxyShortPosition(
@@ -1605,7 +1482,7 @@ export class Router extends BaseContract {
       shortable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateOpenShortPosition(
@@ -1613,7 +1490,7 @@ export class Router extends BaseContract {
       shortable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateProxyBalance(
@@ -1622,7 +1499,7 @@ export class Router extends BaseContract {
       tradable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateProxyShortBalance(
@@ -1631,7 +1508,7 @@ export class Router extends BaseContract {
       shortable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     calculateShortBalance(
@@ -1639,7 +1516,7 @@ export class Router extends BaseContract {
       shortable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     closePosition(
@@ -1688,7 +1565,7 @@ export class Router extends BaseContract {
       trader: string,
       lendable: string,
       tradable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getProxyPosition(
@@ -1696,7 +1573,7 @@ export class Router extends BaseContract {
       lendable: string,
       proxyLendable: string,
       tradable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getProxyShortPosition(
@@ -1704,14 +1581,14 @@ export class Router extends BaseContract {
       lendable: string,
       proxyLendable: string,
       shortable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getShortPosition(
       trader: string,
       lendable: string,
       shortable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     incentivize(
@@ -1732,7 +1609,6 @@ export class Router extends BaseContract {
 
     openPosition(
       request: {
-        short: boolean;
         amountIn: BigNumberish;
         leverageFactor: BigNumberish;
         amountOutMin: BigNumberish;
@@ -1749,6 +1625,44 @@ export class Router extends BaseContract {
           deadline: BigNumberish;
           signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
         };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
+        convertFromNative: boolean;
+      },
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    openShortPosition(
+      request: {
+        amountIn: BigNumberish;
+        baseBorrowAmount: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
         convertFromNative: boolean;
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -1787,22 +1701,14 @@ export class Router extends BaseContract {
     ): Promise<BigNumber>;
 
     withdraw(
-      lendable: string,
-      amount: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    withdrawETH(
-      amount: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    withdrawShortable(
-      shortable: string,
-      amount: BigNumberish,
-      to: string,
+      request: {
+        token: string;
+        amount: BigNumberish;
+        to: string;
+        deadline: BigNumberish;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -1817,7 +1723,7 @@ export class Router extends BaseContract {
       tradable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateOpenPosition(
@@ -1825,7 +1731,7 @@ export class Router extends BaseContract {
       tradable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateOpenProxyPosition(
@@ -1834,7 +1740,7 @@ export class Router extends BaseContract {
       tradable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateOpenProxyShortPosition(
@@ -1843,7 +1749,7 @@ export class Router extends BaseContract {
       shortable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateOpenShortPosition(
@@ -1851,7 +1757,7 @@ export class Router extends BaseContract {
       shortable: string,
       amount: BigNumberish,
       leverageFactor: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateProxyBalance(
@@ -1860,7 +1766,7 @@ export class Router extends BaseContract {
       tradable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateProxyShortBalance(
@@ -1869,7 +1775,7 @@ export class Router extends BaseContract {
       shortable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     calculateShortBalance(
@@ -1877,7 +1783,7 @@ export class Router extends BaseContract {
       shortable: string,
       trader: string,
       amountIn: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     closePosition(
@@ -1926,7 +1832,7 @@ export class Router extends BaseContract {
       trader: string,
       lendable: string,
       tradable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getProxyPosition(
@@ -1934,7 +1840,7 @@ export class Router extends BaseContract {
       lendable: string,
       proxyLendable: string,
       tradable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getProxyShortPosition(
@@ -1942,14 +1848,14 @@ export class Router extends BaseContract {
       lendable: string,
       proxyLendable: string,
       shortable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getShortPosition(
       trader: string,
       lendable: string,
       shortable: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     incentivize(
@@ -1970,7 +1876,6 @@ export class Router extends BaseContract {
 
     openPosition(
       request: {
-        short: boolean;
         amountIn: BigNumberish;
         leverageFactor: BigNumberish;
         amountOutMin: BigNumberish;
@@ -1987,6 +1892,44 @@ export class Router extends BaseContract {
           deadline: BigNumberish;
           signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
         };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
+        convertFromNative: boolean;
+      },
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    openShortPosition(
+      request: {
+        amountIn: BigNumberish;
+        baseBorrowAmount: BigNumberish;
+        leverageFactor: BigNumberish;
+        amountOutMin: BigNumberish;
+        lendable: string;
+        proxy: string;
+        tradable: string;
+        trader: string;
+        deadline: BigNumberish;
+        referrer: string;
+        guardedPrice: {
+          minDeposit: BigNumberish;
+          minPrice: BigNumberish;
+          maxPrice: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationConditions: {
+          stopLossPercentage: BigNumberish;
+          takeProfitPercentage: BigNumberish;
+          deadline: BigNumberish;
+          signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        };
+        terminationReward: BigNumberish;
         convertFromNative: boolean;
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -2025,22 +1968,14 @@ export class Router extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     withdraw(
-      lendable: string,
-      amount: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawETH(
-      amount: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawShortable(
-      shortable: string,
-      amount: BigNumberish,
-      to: string,
+      request: {
+        token: string;
+        amount: BigNumberish;
+        to: string;
+        deadline: BigNumberish;
+        permit: { v: BigNumberish; r: BytesLike; s: BytesLike };
+        convertToNative: boolean;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

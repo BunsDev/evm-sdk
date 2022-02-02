@@ -5,7 +5,6 @@ import { CoreRelevant, Pairs, Reserves } from '.';
 import { Pair__factory, Router__factory } from '../dependencies/protocol';
 
 type OpenPositionRequest = {
-  short: boolean;
   amountIn: BigNumberish;
   leverageFactor: BigNumberish;
   amountOutMin: BigNumberish;
@@ -22,6 +21,13 @@ type OpenPositionRequest = {
     deadline: BigNumberish;
     signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
   };
+  terminationConditions: {
+    stopLossPercentage: BigNumberish;
+    takeProfitPercentage: BigNumberish;
+    deadline: BigNumberish;
+    signature: { v: BigNumberish; r: BytesLike; s: BytesLike };
+  };
+  terminationReward: BigNumberish;
   convertFromNative: boolean;
 };
 
@@ -205,36 +211,36 @@ export class Router extends CoreRelevant<
       .depositETH(this.params.signer.address, { value: amount });
   }
 
-  async useWithdraw(lendable: string, amount: BigNumberish) {
-    if (!this.params.signer) {
-      throw new Error(
-        'Signer is required! Ensure signer configuration in Context params'
-      );
-    }
-    return this.router
-      .connect(this.params.signer)
-      .withdraw(lendable, amount, this.params.signer.address);
-  }
-
-  async useWithdrawShortable(shortable: string, amount: BigNumberish) {
-    if (!this.params.signer) {
-      throw new Error(
-        'Signer is required! Ensure signer configuration in Context params'
-      );
-    }
-    return this.router
-      .connect(this.params.signer)
-      .withdrawShortable(shortable, amount, this.params.signer.address);
-  }
-
-  async useWithdrawNative(amount: BigNumberish) {
-    if (!this.params.signer) {
-      throw new Error(
-        'Signer is required! Ensure signer configuration in Context params'
-      );
-    }
-    return this.router
-      .connect(this.params.signer)
-      .withdrawETH(amount, this.params.signer.address);
-  }
+  // async useWithdraw(lendable: string, amount: BigNumberish) {
+  //   if (!this.params.signer) {
+  //     throw new Error(
+  //       'Signer is required! Ensure signer configuration in Context params'
+  //     );
+  //   }
+  //   return this.router
+  //     .connect(this.params.signer)
+  //     .withdraw(lendable, amount, this.params.signer.address);
+  // }
+  //
+  // async useWithdrawShortable(shortable: string, amount: BigNumberish) {
+  //   if (!this.params.signer) {
+  //     throw new Error(
+  //       'Signer is required! Ensure signer configuration in Context params'
+  //     );
+  //   }
+  //   return this.router
+  //     .connect(this.params.signer)
+  //     .withdrawShortable(shortable, amount, this.params.signer.address);
+  // }
+  //
+  // async useWithdrawNative(amount: BigNumberish) {
+  //   if (!this.params.signer) {
+  //     throw new Error(
+  //       'Signer is required! Ensure signer configuration in Context params'
+  //     );
+  //   }
+  //   return this.router
+  //     .connect(this.params.signer)
+  //     .withdrawETH(amount, this.params.signer.address);
+  // }
 }

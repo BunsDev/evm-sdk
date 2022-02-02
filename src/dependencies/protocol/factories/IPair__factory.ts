@@ -179,7 +179,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    stateMutability: "view",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -285,6 +285,47 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+    ],
+    name: "getTerminationConditions",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "expirationDate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "stopLossPercentage",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "takeProfitPercentage",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "terminationReward",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct TerminationConditions",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "getTotalDeposit",
     outputs: [
@@ -349,6 +390,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "isActive",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -379,36 +433,40 @@ const _abi = [
         name: "trader",
         type: "address",
       },
+    ],
+    name: "positionCosts",
+    outputs: [
       {
         internalType: "uint256",
-        name: "leverageFactor",
+        name: "currentCost",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "amountOutMin",
+        name: "liquidationCost",
         type: "uint256",
       },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
       {
         internalType: "address",
-        name: "referrer",
+        name: "trader",
         type: "address",
       },
       {
         components: [
           {
             internalType: "uint256",
-            name: "minDeposit",
+            name: "stopLossPercentage",
             type: "uint256",
           },
           {
             internalType: "uint256",
-            name: "minPrice",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "maxPrice",
+            name: "takeProfitPercentage",
             type: "uint256",
           },
           {
@@ -439,54 +497,14 @@ const _abi = [
             type: "tuple",
           },
         ],
-        internalType: "struct IPair.GuardedPrice",
-        name: "guardedPrice",
+        internalType: "struct IPair.UpdateTerminationConditionsRequest",
+        name: "request",
         type: "tuple",
       },
     ],
-    name: "openPosition",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "amountOut",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "trader",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "leverageFactor",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "amountOutMin",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "referrer",
-        type: "address",
-      },
-    ],
-    name: "openPositionWithReferrer",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "amountOut",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
+    name: "setTerminationConditions",
+    outputs: [],
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -497,20 +515,9 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "positionCosts",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "currentCost",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "liquidationCost",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
+    name: "terminatePosition",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];
